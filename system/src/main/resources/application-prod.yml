@@ -1,0 +1,34 @@
+system:
+  jwt-secret: QZxMll5%gEX5TtZ1tc^lgDIiWnuA2TmxY6NTWQX14GnWf%O1tGJXc3
+  flash-253-api: https://api.253.com/open/flashsdk
+
+spring:
+  data:
+    redis:
+      repositories:
+        enabled: true
+  datasource:
+    url: jdbc:mysql://mysql:3306/english_learning?serverTimezone=Hongkong
+    username: springboot
+    password: zIRxlmPZFFGngexqPlvgk^Ej
+    druid:
+      filters: stat,wall
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: redis
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: 2s
+    database: 0
+    port: 6379
+    timeout: 4s
+    password: frC4WcYuIPPgh5
+  rabbitmq:
+    addresses: mq:5672
+    username: DtgarZ8g
+    password: AELOJ01wZI7ZfpsR
+    connection-timeout: 5s
+
+logging:
+  path: /cxylm/logs/admin

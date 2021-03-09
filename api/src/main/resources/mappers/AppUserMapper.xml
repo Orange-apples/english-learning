@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.AppUserMapper">
+
+    <select id="findByMobile" resultType="com.cxylm.springboot.model.AppUser">
+        SELECT * FROM app_user WHERE mobile = #{mobile} AND merchant = #{merchant}
+    </select>
+
+    <select id="findByUsername" resultType="com.cxylm.springboot.model.AppUser">
+        SELECT * FROM app_user WHERE username = #{username} AND merchant = #{merchant}
+    </select>
+
+    <update id="updateStudyState">
+        update app_user
+        set learning_time = #{learningTime},
+        spell_time = #{spellTime},
+        coin = (coin + #{coin})
+        <if test="bookId != null and unitId != null and wordId != null and unitState != null">
+            ,book_id = #{bookId}
+            ,unit_id = #{unitId}
+            ,last_word_id = #{wordId}
+            ,unit_state = #{unitState}
+        </if>
+        <if test="listenUnitId != null">
+            ,listen_unit_id = #{listenUnitId}
+        </if>
+        <if test="lastReviewTime != null">
+            ,last_review_time = #{lastReviewTime}
+        </if>
+        where id = #{userId}
+    </update>
+
+    <update id="updateTestTime">
+        update app_user
+        set test_time = test_time + #{times}
+        where id = #{userId}
+    </update>
+
+    <!-- 查询当日新增学员 -->
+    <select id="todayIncrese" resultType="java.lang.Integer">
+        select count(id) count from app_user
+          where school_id = #{schoolId} AND account_state != #{accountState}
+            and merchant = #{merchant}
+                and to_days(create_time) = to_days(now())
+    </select>
+
+    <!-- 查询学员访问记录 -->
+    <select id="selectStudentVisitInfo" resultType="com.cxylm.springboot.dto.result.AppuserDto">
+        select COUNT(DISTINCT lre.id) count,apu.id,apu.nickname,apu.username,apu.mobile,apu.create_time,apu.gender from login_record lre
+            INNER JOIN app_user apu
+                ON apu.school_id = #{schoolId}
+                       AND apu.account_state != #{accountState}
+                       AND apu.merchant = #{merchant}
+                <if test="nickName != null and nickName != ''">
+                    AND apu.nickName LIKE CONCAT('%', #{nickName}, '%')
+                </if>
+                       AND lre.user_id = apu.id
+        GROUP BY lre.user_id
+    </select>
+</mapper>

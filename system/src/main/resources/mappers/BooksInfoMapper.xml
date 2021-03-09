@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.BookInfoMapper">
+
+    <!-- 根据版本名称查询课程列表 -->
+    <select id="selectBooksByCondition" resultType="com.cxylm.springboot.model.BookInfo">
+        select *
+        from book_info
+        where 1=1
+        <if test="form.level != null">
+            and level = #{form.level}
+        </if>
+        <if test="form.name != null and form.name != ''">
+            and name like CONCAT('%', #{form.name}, '%')
+        </if>
+        <if test="form.edition != null and form.edition != ''">
+            and edition like CONCAT('%', #{form.edition}, '%')
+        </if>
+        <if test="form.publisher != null and form.publisher != ''">
+            and edition = #{form.publisher}
+        </if>
+    </select>
+
+    <select id="selectBookPublishers" resultType="java.lang.String">
+        SELECT edition FROM book_info GROUP BY edition
+    </select>
+
+</mapper>

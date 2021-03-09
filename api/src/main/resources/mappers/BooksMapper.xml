@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.BooksMapper">
+
+    <!--查询各个阶段对应的版本列表-->
+    <select id="selectEditionByLevel" resultType="java.lang.String">
+        select distinct edition
+        from book_info
+        where `level` = #{level}
+    </select>
+
+    <!-- 根据版本名称查询课程列表 -->
+    <select id="selectBooksByCondition" resultType="com.cxylm.springboot.dto.result.BooksDto">
+        select bi.id, bi.name, bi.press,bi.pic,bi.free,bi.id b_id
+            <!-- 表示是否为试用,0为已开通,1为试用(未开通也标记为试用), -->
+            <if test="form.userId != null">
+                ,IFNULL( ( SELECT is_try FROM study_book_rate sbr
+                WHERE
+                    sbr.user_id = #{form.userId} AND sbr.book_id = b_id
+                    AND sbr.unit_id = 0
+                    AND sbr.state = 0
+                ORDER BY sbr.unit_id ,sbr.state
+                LIMIT 1
+                ),1) is_try
+            </if>
+        from book_info bi
+        where 1=1
+        <if test="form.level != null">
+            and bi.level = #{form.level}
+        </if>
+        <if test="form.name != null and form.name != ''">
+            and bi.name like CONCAT('%', #{form.name}, '%')
+        </if>
+        <if test="form.edition != null and form.edition != ''">
+            and bi.edition = #{form.edition}
+        </if>
+        <if test="form.publisher != null and form.publisher != ''">
+            <!-- PS这里form.publisher应该叫做edition，前端不想改了就这 -->
+            and bi.edition = #{form.publisher}
+        </if>
+    </select>
+
+    <select id="selectBookPublishers" resultType="java.lang.String">
+        SELECT edition FROM book_info GROUP BY edition
+    </select>
+
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.AppUpdateMapper">
+    <select id="checkForUpdate" resultType="com.cxylm.springboot.dto.result.AppUpdateDto">
+        SELECT id,
+               version_code,
+               url,
+               create_time,
+               log,
+               min_version_code,
+               version
+        FROM app_update_record
+        WHERE platform = #{platform}
+        ORDER BY version_code DESC
+        LIMIT 1
+    </select>
+</mapper>

@@ -1,0 +1,40 @@
+system:
+  jwt-secret: 26uEnFkviM0qkXQ9NC&K6^jNnuYPJ$Kb$lUYwKId6famyYRVTSFbbU
+  flash-253-api: https://api.253.com/open/flashsdk
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+spring:
+  data:
+    redis:
+      repositories:
+        enabled: true
+  datasource:
+    url: jdbc:mysql://121.42.231.149:16953/english_learning?serverTimezone=Hongkong
+    username: root
+    password: 76qsnwuIC8lRnztP
+    druid:
+      filters: stat,wall
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: 2s
+    database: 2
+    port: 6379
+    timeout: 2s
+    #password: youmian
+  rabbitmq:
+    addresses: 127.0.0.1:5672
+#    username: hdkx
+#    password: dev
+    connection-timeout: 5s
+
+logging:
+  path: /log/cxylm-system
+server:
+  port: 8008

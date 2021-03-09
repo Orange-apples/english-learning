@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.CourseOpenRecordMapper">
+
+    <select id="sta" resultType="com.cxylm.springboot.dto.BDStaDto">
+        SELECT COUNT(1) course_count, SUM(cor.course_price) courseSellPrice
+        FROM course_open_record cor
+        WHERE cor.bd_id = #{bdId}
+          AND cor.create_time BETWEEN #{begin, jdbcType=DATE} AND #{end, jdbcType=DATE}
+    </select>
+</mapper>

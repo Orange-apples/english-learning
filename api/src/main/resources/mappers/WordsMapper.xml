@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.WordsMapper">
+
+    <select id="getStudyWords" resultType="com.cxylm.springboot.dto.result.WordsDto">
+        select id as wordId, word, mean, symbol_a, symbol_b
+        from words
+        where book_id = #{form.bookId}
+          and unit = #{form.unitId}
+          <if test="lastWordsId != null">
+              AND id > #{lastWordsId}
+          </if>
+        order by id
+    </select>
+
+<!--    <select id="getTestWord" resultType="com.cxylm.springboot.dto.result.TestWordsDto">-->
+<!--        SELECT-->
+<!--            swr.`level`,swr.word_id,w.word,w.book_id,w.mean as question,w.book_id-->
+<!--        FROM study_word_records swr-->
+<!--        LEFT JOIN words w ON w.id = swr.word_id-->
+<!--        WHERE-->
+<!--            swr.user_id = #{userId}-->
+<!--        ORDER BY-->
+<!--            swr.`level` ,swr.test_times ,swr.create_time ,swr.error_times DESC-->
+<!--        LIMIT #{limit_size}-->
+<!--    </select>-->
+    <select id="getTestWords" resultType="com.cxylm.springboot.dto.result.TestWordsDto">
+        select swr.word_id, words.mean as question, words.word, words.book_id,
+        (10-datediff(now(),last_error_time))/5+level as levels
+        from words right join study_word_records swr on words.id = swr.word_id
+        where swr.user_id = #{userId}
+        order by swr.test_times, levels, swr.error_times desc, swr.last_error_time desc
+        limit #{form.size}
+    </select>
+
+    <select id="getBlurWords" resultType="com.cxylm.springboot.dto.result.WordsDto">
+        select t1.id as wordId, t1.word, t1.mean, t1.symbol_a, t1.symbol_b
+        from words AS t1
+                 JOIN (
+            select distinct id
+            from (SELECT ROUND(RAND() * ((SELECT MAX(id) FROM words where book_id = #{bookId}) -
+                                         (SELECT MIN(id) FROM words where book_id = #{bookId})) +
+                               (SELECT MIN(id) FROM words where book_id = #{bookId})
+                             ) AS id
+                  from words) as t3
+            limit #{size}) AS t2 on t1.id = t2.id
+        ORDER BY t1.id
+    </select>
+
+    <select id="getUnitTestWords" resultType="com.cxylm.springboot.dto.result.TestWordsDto">
+        select id wordId, mean as question, word, book_id
+        from words
+        where book_id = #{bookId}
+          and unit = #{unitId}
+    </select>
+
+    <select id="getUntilTestWords" resultType="com.cxylm.springboot.dto.result.TestWordsDto">
+        select words.id                                               word_id,
+               words.mean                                          as question,
+               words.word,
+               words.book_id,
+               (10 - datediff(now(), last_error_time)) / 5 + level as levels
+        from words
+                 right join study_word_records swr on words.id = swr.word_id
+        where words.book_id = #{bookId}
+          and swr.user_id = #{userId}
+        order by swr.error_times desc, levels
+    </select>
+    <select id="selectTotaleByUnit" resultType="java.lang.Long">
+        select count(id)
+        from words
+        where book_id = #{bookId} and unit = #{unitId}
+    </select>
+
+    <select id="getTotalByBookId" resultType="java.lang.Long">
+        select count(id)
+        from words
+        where book_id = #{bookId}
+    </select>
+
+    <select id="getMaxUnit" resultType="java.lang.Integer">
+        SELECT MAX(unit) FROM words WHERE book_id = #{bookId}
+    </select>
+
+    <select id="getMaxWordIdByUnit" resultType="java.lang.Integer">
+        SELECT MAX(id) FROM words WHERE book_id = #{bookId} and unit = #{unitId}
+    </select>
+
+</mapper>

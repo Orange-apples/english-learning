@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.StudyBookRateMapper">
+
+
+    <select id="getTryCourseCount" resultType="java.lang.Integer">
+        SELECT count(1)
+            FROM study_book_rate sbr
+        WHERE user_id = #{userId} AND is_try = 1
+       </select>
+
+    <select id="getMyBooks" resultType="com.cxylm.springboot.dto.result.MyBooksDto">
+        select distinct sbr.book_id, bi.name
+        from study_book_rate as sbr
+                 inner join book_info as bi on (sbr.book_id = bi.id)
+                  where sbr.user_id = #{userId}
+        order by sbr.book_id desc
+    </select>
+
+    <select id="getBooksByStatus" resultType="com.cxylm.springboot.dto.result.MyBooksDto">
+        select distinct sbr.book_id, bi.name
+        from study_book_rate as sbr
+                 inner join book_info as bi on (sbr.book_id = bi.id)
+                  where sbr.user_id = #{userId}
+                  <if test="status != null and status == 1">
+                      AND( sbr.expire_time > UNIX_TIMESTAMP(NOW()) OR sbr.expire_time IS NULL)
+                  </if>
+                  <if test="status != null and status == 2">
+                    AND( sbr.expire_time <![CDATA[ < ]]> UNIX_TIMESTAMP(NOW()))
+                  </if>
+        order by sbr.book_id desc
+    </select>
+
+    <select id="getBookUnitState" resultType="com.cxylm.springboot.dto.result.BooksUnitStateDto">
+        select unit.unitId, ifnull(sbr.state, 0) as state
+        from (select distinct unit as unitId
+              from words
+              where book_id = #{bookId}
+        ) as unit
+        left join study_book_rate as sbr
+             on (sbr.user_id = #{userId} and sbr.book_id = #{bookId} and unit.unitId = sbr.unit_id)
+        order by unit.unitId
+    </select>
+
+    <select id="checkUntilTest" resultType="java.lang.Boolean">
+        select (select max(unit)
+                from words
+                where book_id = #{bookId}) + 1
+                   =
+               (select count(distinct unit_id)
+                from study_book_rate
+                where user_id = #{userId}
+                  and book_id = #{bookId})
+    </select>
+    <select id="getStudyBookRateByBookIdAndUserIdAndUnitId"
+            resultType="com.cxylm.springboot.model.StudyBookRate">
+        select *
+        from study_book_rate
+        where user_id = #{userId} and book_id = #{bookId} and unit_id = #{unitId}
+    </select>
+
+    <select id="scanExpiredCourse" resultType="com.cxylm.springboot.model.StudyBookRate">
+        SELECT * FROM study_book_rate sbr WHERE sbr.review_expire_time &lt; #{now}
+    </select>
+
+    <select id="getFreeCourseCount" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM study_book_rate sbr
+                     INNER JOIN book_info
+                ON sbr.user_id = #{userId}
+                        AND sbr.book_id = book_info.id
+                        AND book_info.free = 1
+    </select>
+</mapper>

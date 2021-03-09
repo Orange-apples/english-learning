@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.WordsManageMapper">
+
+    <select id="selectAllWordsByCourse" resultType="com.cxylm.springboot.model.Words">
+        select *
+        from words
+        where book_id = #{bookId}
+        <if test="form.name != null and form.name != ''">
+            and word like CONCAT('%', #{form.name}, '%')
+        </if>
+    </select>
+
+</mapper>

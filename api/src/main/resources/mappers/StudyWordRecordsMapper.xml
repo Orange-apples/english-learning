@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.StudyWordRecordsMapper">
+
+    <select id="review" resultType="com.cxylm.springboot.dto.result.WordsDto">
+        select swr.word_id,
+               words.word,
+               words.mean,
+               words.symbol_a,
+               words.symbol_b,
+               (10 - datediff(now(), last_error_time)) / 5 + level as levels
+        from study_word_records swr
+                 inner join words on (swr.word_id = words.id)
+        where swr.user_id = #{userId}
+          and swr.level &lt;&gt; 5
+          and datediff(now(), swr.memory_time) != 0
+        order by swr.memory_time desc, levels, swr.level, swr.error_times desc, swr.last_error_time desc
+        limit #{maxReviewWord}
+    </select>
+
+    <insert id="insertBatch">
+        INSERT INTO study_word_records (word_id, user_id, level, error_times, memory_time) VALUES
+        <foreach collection="words" item="word" separator=",">
+            (#{word.wordId},
+            #{userId},
+            0,
+            #{word.errorTimes},
+            #{memoryTime})
+        </foreach>
+    </insert>
+
+    <select id="dictation" resultType="com.cxylm.springboot.dto.result.WordsDto">
+        select swr.word_id, words.word, words.mean, words.symbol_a, words.symbol_b
+        from study_word_records swr
+                 inner join words on (swr.word_id = words.id)
+        where swr.user_id = #{userId}
+          and words.book_id = #{form.bookId}
+          and swr.error_times &gt; 3
+        order by swr.error_times desc
+        limit 10
+    </select>
+
+    <update id="updateTestTime">
+        update study_word_records
+        set test_times = test_times + 1
+        where id IN
+        <foreach collection="words" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="getWordBook" resultType="com.cxylm.springboot.dto.result.WordsDto">
+        select words.id as wordId, words.word, words.mean, words.symbol_a, words.symbol_b
+        from study_word_records swr inner join words on (swr.word_id = words.id)
+        where swr.user_id = #{userId}
+        <if test="type == null or type ==0">
+            order by words.word
+        </if>
+        <if test="type ==1">
+            order by swr.level
+        </if>
+        <if test="type ==2">
+            and swr.level = 0
+        </if>
+        <if test="type ==3">
+            and swr.level in (1,2,3,4)
+        </if>
+        <if test="type ==4">
+            and swr.level = 5
+        </if>
+    </select>
+
+    <select id="selectBatchByWordsId" resultType="com.cxylm.springboot.model.StudyWordRecords">
+        select *
+        from study_word_records
+        where user_id = #{userId} and word_id in
+        <foreach collection="words" item="form" open="("
+                 separator="," close=")">
+            #{form.wordId}
+        </foreach>
+    </select>
+
+    <select id="checkReview" resultType="java.lang.Integer">
+        select count(id)
+        from study_word_records
+        where user_id = #{userId}
+          and level &lt; 5
+          AND datediff(now(), study_word_records.memory_time) != 0
+    </select>
+
+    <select id="selectByWordsList" resultType="com.cxylm.springboot.model.StudyWordRecords">
+        select *
+        from study_word_records
+        where word_id in (#{wordsList})
+    </select>
+</mapper>

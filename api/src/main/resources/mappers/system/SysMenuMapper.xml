@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxylm.springboot.dao.SysMenuMapper">
+    <select id="findUserPermissions" resultType="com.cxylm.springboot.model.system.Menu">
+        SELECT DISTINCT m.permission
+        FROM sys_role r
+                 LEFT JOIN sys_user_role ur ON r.id = ur.role_id
+                 LEFT JOIN sys_user u ON u.id = ur.user_id
+                 LEFT JOIN sys_role_menu rm on r.id = rm.role_id
+                 LEFT JOIN sys_menu m ON m.id = rm.menu_id
+        WHERE u.id = #{userId}
+          AND m.name is not null
+          AND m.name &lt;&gt; ''
+    </select>
+
+    <select id="findUserMenus" resultType="com.cxylm.springboot.model.system.Menu">
+            SELECT m.*
+            FROM sys_menu m
+            <where>
+                <if test="menuOnly">
+                    m.type &lt;&gt; 1
+                </if>
+               AND m.id in
+                  (SELECT DISTINCT rm.menu_id
+                   FROM sys_role_menu rm
+                            LEFT JOIN sys_role r ON rm.role_id = r.id
+                            LEFT JOIN sys_user_role ur ON ur.role_id = r.id
+                            LEFT JOIN sys_user u ON u.id = ur.user_id
+                   WHERE u.id = #{userId})
+            </where>
+            ORDER BY m.order_num
+    </select>
+
+    <select id="getMenuList" resultType="com.cxylm.springboot.model.system.Menu">
+        SELECT * FROM sys_menu
+    </select>
+
+    <select id="findRoleMenus" resultType="com.cxylm.springboot.model.system.Menu">
+        SELECT m.*
+        FROM sys_role sr
+                 INNER JOIN sys_role_menu srm ON sr.id = srm.role_id
+                 INNER JOIN sys_menu m ON m.id = srm.menu_id
+        WHERE sr.id = #{roleId} AND NOT EXISTS (SELECT 1 FROM sys_menu t31 WHERE t31.pid = m.id)
+        ORDER BY m.order_num
+    </select>
+</mapper>

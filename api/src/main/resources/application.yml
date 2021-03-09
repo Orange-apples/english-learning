@@ -1,0 +1,57 @@
+#server:
+#  port: 8081
+
+spring:
+  profiles:
+    active: prod
+#    active: @spring.active@s
+
+  jackson:
+    # Null字段不加入序列化
+    default-property-inclusion: non_null
+    serialization:
+      #不进行格式化输出
+      indent_output: false
+      #忽略无法转换的对象
+      fail_on_empty_beans: false
+    deserialization:
+      #允许对象忽略json中不存在的属性
+      fail_on_unknown_properties: false
+    time-zone: Asia/Shanghai
+
+  quartz:
+    scheduler-name: cxylm
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    wait-for-jobs-to-complete-on-shutdown: true
+    startup-delay: 10s
+    properties:
+      # See http://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/
+      org:
+        quartz:
+          scheduler:
+            instanceName: cxylm-clustered-scheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: true
+            clusterCheckinInterval: 10000
+            useProperties: true
+          plugin:
+            shutdownHook:
+              class: org.quartz.plugins.management.ShutdownHookPlugin
+              cleanShutdown: true
+#    overwrite-existing-jobs: true
+
+mybatis-plus:
+  type-aliases-package: com.cxylm.springboot.model,com.cxylm.springboot.system.model
+  type-enums-package: com.cxylm.springboot.enums,com.cxylm.springboot.system.enums
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:mappers/**/*.xml
+manager:
+  shiro:
+    anon-urls: /api/manager/user/login
