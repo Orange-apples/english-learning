@@ -81,16 +81,16 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
                 .eq(StudyBookRate::getUserId, userId)
                 .eq(StudyBookRate::getBookId, bookId)
                 .eq(StudyBookRate::getUnitId, unitId));
-        if(count > 0){
+        if (count > 0) {
             appResponse.setCode(-1);
             appResponse.setMessage("该单元已开通,请刷新页面重试");
-            return new ResponseEntity<Object>(appResponse,HttpStatus.OK);
+            return new ResponseEntity<Object>(appResponse, HttpStatus.OK);
         }
 
-        if(coin < 50){
+        if (coin < 50) {
             appResponse.setCode(-1);
             appResponse.setMessage("您的金币余额不足");
-            return new ResponseEntity<Object>(appResponse,HttpStatus.OK);
+            return new ResponseEntity<Object>(appResponse, HttpStatus.OK);
         }
 
         coin -= 50;
@@ -108,14 +108,14 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
             int rateSave = baseMapper.insert(bookRate);
             if (rateSave > 0) {
                 appResponse.setMessage("开通成功");
-                return new ResponseEntity<Object>(appResponse,HttpStatus.OK);
+                return new ResponseEntity<Object>(appResponse, HttpStatus.OK);
             }
         }
 
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         appResponse.setCode(-1);
         appResponse.setMessage("开通失败");
-        return new ResponseEntity<Object>(appResponse,HttpStatus.OK);
+        return new ResponseEntity<Object>(appResponse, HttpStatus.OK);
     }
 
     /**
@@ -126,15 +126,15 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
      * @return
      */
     @Override
-    public boolean checkOpenState(Integer bookId, Integer userId,Integer type) {
+    public boolean checkOpenState(Integer bookId, Integer userId, Integer type) {
         //TODO 需校验bookId是否存在，暂时不写
 //        Integer count = baseMapper.selectCount(new QueryWrapper<StudyBookRate>().eq("book_id", bookId).eq("user_id", userId).eq("is_try",0));
         Integer count = baseMapper.selectCount(new QueryWrapper<StudyBookRate>()
                 .eq("book_id", bookId)
                 .eq("user_id", userId)
-                .eq("unit_id",0)
-                .eq("state",0)
-                .eq("is_try",type));
+                .eq("unit_id", 0)
+                .eq("state", 0)
+                .eq("is_try", type));
         if (count == null || count == 0) {
             //未开通
             return false;
@@ -224,12 +224,11 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
             for (int i = 0; i < unitState.size(); i++) {
                 BooksUnitStateDto unitStateDto = unitState.get(i);
                 //试用课程前两个单元为试用状态,后面的锁死
-                if (i >= 2){
+                if (i >= 2) {
                     unitStateDto.setState(StudyRateState.CREATE);
-                }else{
+                } else {
                     unitStateDto.setState(StudyRateState.TRY);
                 }
-
             }
         }
         return unitState;
@@ -283,16 +282,17 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
 
     /**
      * 根据学习类型更新课程单元状态
-     *  @param studyType
+     *
+     * @param studyType
      * @param studyBookRate
-     * @param overState 学习完成状态
+     * @param overState     学习完成状态
      */
     @Override
     public void updateStudyState(StudyType studyType, StudyBookRate studyBookRate, boolean overState) {
         StudyRateState wordsOver = null;
         switch (studyType) {
             case LEARN:
-                if(!overState){
+                if (!overState) {
                     break;
                 }
                 StudyRateState state = studyBookRate.getState();
@@ -474,7 +474,7 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
         BookInfo bookInfo = booksService.getById(bookId);
         AssertUtil.isTrue(bookInfo != null, "课程不存在，请联系平台");
 
-        boolean opened = this.checkOpenState(bookId, userId,1);
+        boolean opened = this.checkOpenState(bookId, userId, 1);
         AssertUtil.isFalse(opened, "该课程已经开通了");
         AssertUtil.isTrue(baseMapper.getTryCourseCount(userId) < 2, "最多开通2个免费课程");
 
@@ -486,13 +486,13 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
     public Integer getBookIsTry(Integer bookId, Integer userId) {
         QueryWrapper<StudyBookRate> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("is_try");
-        queryWrapper.eq("book_id",bookId);
-        queryWrapper.eq("user_id",userId);
-        queryWrapper.eq("unit_id",0);
-        queryWrapper.eq("state",0);
+        queryWrapper.eq("book_id", bookId);
+        queryWrapper.eq("user_id", userId);
+        queryWrapper.eq("unit_id", 0);
+        queryWrapper.eq("state", 0);
 
-        StudyBookRate studyBookRate = baseMapper.selectOne(queryWrapper);
-        return studyBookRate.getIsTry();
+        List<StudyBookRate> list = baseMapper.selectList(queryWrapper);
+        return list.get(0).getIsTry();
     }
 
     @Override

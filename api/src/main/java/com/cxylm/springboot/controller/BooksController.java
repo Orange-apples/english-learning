@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/api/b=s")
+@RequestMapping("/api/books")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class BooksController extends ApiController {
