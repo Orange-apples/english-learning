@@ -492,6 +492,9 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
         queryWrapper.eq("state", 0);
 
         List<StudyBookRate> list = baseMapper.selectList(queryWrapper);
+        if (list == null || list.isEmpty()) {
+            return 1;
+        }
         return list.get(0).getIsTry();
     }
 
