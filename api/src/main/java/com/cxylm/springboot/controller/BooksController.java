@@ -140,7 +140,7 @@ public class BooksController extends ApiController {
     @Transactional
     public Object OpenCourse(@RequestBody @Validated OpenCourseDto form) {
         CourseCard courseCard = courseCardService.getOne(new QueryWrapper<CourseCard>().eq("no", form.getNo()).eq("password", form.getPassword()));
-        AssertUtil.isTrue(courseCard != null /*&& !courseCard.getUsed()*/, "无效的卡密");
+        AssertUtil.isTrue(courseCard != null && !courseCard.getUsed(), "无效的卡密");
         final Long expireTime = courseCard.getExpireTime();
         if (expireTime != null) AssertUtil.isTrue(expireTime > System.currentTimeMillis(), "该卡已过期");
 
