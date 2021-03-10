@@ -1,9 +1,9 @@
-#server:
-#  port: 8081
+server:
+  port: 8081
 
 spring:
   profiles:
-    active: prod
+    active: dev
 #    active: @spring.active@s
 
   jackson:

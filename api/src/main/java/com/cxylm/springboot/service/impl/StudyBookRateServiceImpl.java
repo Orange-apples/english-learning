@@ -126,7 +126,7 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
      * @return
      */
     @Override
-    public boolean checkOpenState(Integer bookId, Integer userId) {
+    public boolean checkOpenState(Integer bookId, Integer userId,Integer type) {
         //TODO 需校验bookId是否存在，暂时不写
 //        Integer count = baseMapper.selectCount(new QueryWrapper<StudyBookRate>().eq("book_id", bookId).eq("user_id", userId).eq("is_try",0));
         Integer count = baseMapper.selectCount(new QueryWrapper<StudyBookRate>()
@@ -134,7 +134,7 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
                 .eq("user_id", userId)
                 .eq("unit_id",0)
                 .eq("state",0)
-                .eq("is_try",0));
+                .eq("is_try",type));
         if (count == null || count == 0) {
             //未开通
             return false;
@@ -474,7 +474,7 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
         BookInfo bookInfo = booksService.getById(bookId);
         AssertUtil.isTrue(bookInfo != null, "课程不存在，请联系平台");
 
-        boolean opened = this.checkOpenState(bookId, userId);
+        boolean opened = this.checkOpenState(bookId, userId,1);
         AssertUtil.isFalse(opened, "该课程已经开通了");
         AssertUtil.isTrue(baseMapper.getTryCourseCount(userId) < 2, "最多开通2个免费课程");
 

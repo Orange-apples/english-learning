@@ -162,7 +162,7 @@ public class BooksController extends ApiController {
             if (!isLocked) {
                 return AppResponse.badRequest("服务器繁忙，请稍后再试");
             }
-            boolean state = studyBookRateService.checkOpenState(bookId, userId);
+            boolean state = studyBookRateService.checkOpenState(bookId, userId,0);
             if (state) {
                 throw new AppBadRequestException("该课程已经开通了");
             }

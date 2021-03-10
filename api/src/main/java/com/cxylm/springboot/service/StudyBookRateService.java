@@ -53,7 +53,7 @@ public interface StudyBookRateService extends IService<StudyBookRate> {
      * @param userId
      * @return
      */
-    boolean checkOpenState(Integer bookId, Integer userId);
+    boolean checkOpenState(Integer bookId, Integer userId,Integer type);
 
     /**
      * 开通课程

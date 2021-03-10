@@ -12,7 +12,7 @@
     <!-- 根据版本名称查询课程列表 -->
     <select id="selectBooksByCondition" resultType="com.cxylm.springboot.dto.result.BooksDto">
         select bi.id, bi.name, bi.press,bi.pic,bi.free,bi.id b_id
-            <!-- 表示是否为试用,0为已开通,1为试用(未开通也标记为试用), -->
+            <!-- 表示是否为试用,0为已开通,1为试用(未开通也标记为试用),3为未开通 -->
             <if test="form.userId != null">
                 ,IFNULL( ( SELECT is_try FROM study_book_rate sbr
                 WHERE
@@ -21,7 +21,7 @@
                     AND sbr.state = 0
                 ORDER BY sbr.unit_id ,sbr.state
                 LIMIT 1
-                ),1) is_try
+                ),3) is_try
             </if>
         from book_info bi
         where 1=1
