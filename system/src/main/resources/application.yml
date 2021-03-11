@@ -50,6 +50,3 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
   mapper-locations: classpath:mappers/**/*.xml
-server:
-  servlet:
-    context-path: /system

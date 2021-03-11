@@ -40,3 +40,5 @@ logging:
 #  port: 8008
 server:
   port: 8082
+  servlet:
+    context-path: /system
