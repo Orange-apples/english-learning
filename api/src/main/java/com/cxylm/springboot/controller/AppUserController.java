@@ -2,6 +2,7 @@ package com.cxylm.springboot.controller;
 
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cxylm.springboot.annotation.PublicAPI;
 import com.cxylm.springboot.config.JwtHelper;
 import com.cxylm.springboot.constant.CacheName;
@@ -14,6 +15,8 @@ import com.cxylm.springboot.exception.AppBadRequestException;
 import com.cxylm.springboot.exception.AppBizException;
 import com.cxylm.springboot.model.AppUser;
 import com.cxylm.springboot.model.AppUserConfig;
+import com.cxylm.springboot.model.BookInfo;
+import com.cxylm.springboot.model.StudyBookRate;
 import com.cxylm.springboot.response.AppResponse;
 import com.cxylm.springboot.service.*;
 import com.cxylm.springboot.util.AssertUtil;
@@ -41,8 +44,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.groups.Default;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -85,7 +90,7 @@ public class AppUserController extends ApiController {
             appUser = appUserService.register(form, AccountType.STUDENT);
 
             // 开通免费课程
-            /*final List<BookInfo> bookInfoList =
+            final List<BookInfo> bookInfoList =
                     bookInfoService.list(new QueryWrapper<BookInfo>()
                             .eq("free", true));
             if (bookInfoList.size() > 0) {
@@ -98,7 +103,7 @@ public class AppUserController extends ApiController {
                     return studyBookRate;
                 }).collect(Collectors.toList());
                 bookRateService.saveBatch(collect);
-            }*/
+            }
         } catch (InterruptedException e) {
             log.error("Error while getting appuser redis lock.", e);
             return AppResponse.badRequest("服务器繁忙，请稍后再试");

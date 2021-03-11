@@ -1,6 +1,7 @@
 package com.cxylm.springboot.dto.result;
 
 import com.cxylm.springboot.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -28,5 +29,6 @@ public class UserInfoDto {
     private String wxOpenId;
 
     /**注册时间*/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "GMT+8")
     private Date createTime;
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
@@ -16,8 +17,10 @@ import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
 public class UserInfoForm {
 
     /**昵称*/
-    @NotNull
+    @NotNull(message = "昵称不能为空")
+    @Size(max = 16,message = "昵称长度请在16个字符以内")
     private String nickname;
+
     private String avatar;
 
     /**性别*/

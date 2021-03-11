@@ -37,4 +37,4 @@ spring:
 logging:
   path: /log/cxylm-system
 server:
-  port: 8008
+  port: 8082

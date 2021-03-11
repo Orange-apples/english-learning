@@ -45,7 +45,9 @@ public class SysUserController extends ApiController {
     @PostMapping("/user/login")
     public Object login(@RequestBody @Validated LoginForm form) {
         final User user = sysUserService.findByUserName(form.getUsername());
-        if (user == null || !user.getPassword().equals(DigestUtil.sha256Hex(form.getPassword() + user.getSalt()))) {
+        String pwd = DigestUtil.sha256Hex(form.getPassword() + user.getSalt());
+        System.out.println(pwd);
+        if (user == null || !user.getPassword().equals(pwd)) {
             return AppResponse.badRequest("用户名或密码错误");
         }
 

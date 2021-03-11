@@ -1,5 +1,7 @@
 package com.cxylm.springboot.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cxylm.springboot.annotation.PublicAPI;
 import com.cxylm.springboot.dto.form.AddWordsForm;
@@ -40,6 +42,10 @@ public class WordsManageController extends ApiController {
 //        if (file == null) {
 //            throw new AppBadRequestException("文件为空!");
 //        }
+        int count = bookInfoService.count(new LambdaQueryWrapper<BookInfo>().eq(BookInfo::getName, form.getName()));
+        if (count > 0) {
+            throw new AppBadRequestException("课程名称重复");
+        }
 
         //获取文件名
         MultipartFile file = form.getFile();
@@ -52,7 +58,7 @@ public class WordsManageController extends ApiController {
         BookInfo bookInfo = new BookInfo();
         BeanUtils.copyProperties(form, bookInfo, "level");
         BookLevel level = BookLevel.valueOfInt(form.getLevel());
-        if(level == null){
+        if (level == null) {
             throw new AppBadRequestException("学习阶段错误！");
         }
         bookInfo.setLevel(level);
@@ -65,6 +71,7 @@ public class WordsManageController extends ApiController {
     /**
      * 获取所有课程
      * 分页
+     *
      * @return
      */
     @PostMapping("/allCourse")
@@ -77,6 +84,7 @@ public class WordsManageController extends ApiController {
 
     /**
      * 修改课程信息
+     *
      * @return
      */
     @PostMapping("/updateCourse")
@@ -84,7 +92,7 @@ public class WordsManageController extends ApiController {
     @Transactional
     public Object updateCourse(@RequestBody @Validated BookInfo bookInfo) {
         boolean b = bookInfoService.updateById(bookInfo);
-        if(!b){
+        if (!b) {
             throw new AppBizException("修改课程信息失败");
         }
         return SUCCESS;
@@ -92,6 +100,7 @@ public class WordsManageController extends ApiController {
 
     /**
      * 获取课程单词
+     *
      * @return
      */
     @PostMapping("/getWords/{bookId}")
@@ -104,6 +113,7 @@ public class WordsManageController extends ApiController {
 
     /**
      * 新增单词
+     *
      * @return
      */
     @PostMapping("/addWord")
@@ -111,7 +121,7 @@ public class WordsManageController extends ApiController {
     @Transactional
     public Object addWord(@RequestBody @Validated Words word) {
         boolean b = word.insert();
-        if(!b){
+        if (!b) {
             throw new AppBizException("新增单词失败");
         }
         return SUCCESS;
@@ -119,6 +129,7 @@ public class WordsManageController extends ApiController {
 
     /**
      * 修改单词
+     *
      * @return
      */
     @PostMapping("/updateWord")
@@ -126,7 +137,7 @@ public class WordsManageController extends ApiController {
     @Transactional
     public Object updateWord(@RequestBody @Validated Words word) {
         boolean b = word.updateById();
-        if(!b){
+        if (!b) {
             throw new AppBizException("新增单词失败");
         }
         return SUCCESS;
@@ -134,6 +145,7 @@ public class WordsManageController extends ApiController {
 
     /**
      * 删除单词
+     *
      * @return
      */
     @DeleteMapping("/deleteWord/{wordsId}")
@@ -141,7 +153,7 @@ public class WordsManageController extends ApiController {
     @Transactional
     public Object deleteWord(@PathVariable Integer wordsId) {
         boolean b = wordsManageService.removeById(wordsId);
-        if(!b){
+        if (!b) {
             throw new AppBizException("删除单词失败");
         }
         return SUCCESS;

@@ -1,6 +1,7 @@
 package com.cxylm.springboot.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cxylm.springboot.dto.result.TestResultDto;
 import com.cxylm.springboot.dto.result.XyDateDto;
 import com.cxylm.springboot.factory.ApiPageFactory;
 import com.cxylm.springboot.model.AppUser;
@@ -59,10 +60,12 @@ public class StudyReportController extends ApiController {
         Integer spellTime = appUser.getSpellTime();
         Integer testTime = appUser.getTestTime();
         int allTime = learningTime + spellTime + testTime;
-        int learning = learningTime *100 / allTime;
+        Double learning = learningTime * 100.0 / allTime;
         Map<String, Integer> map = new HashMap<>(4);
-        map.put("learning", learning);
-        map.put("spell", 100 - learning);
+        map.put("learning", learningTime);
+        map.put("spell", spellTime);
+        map.put("test", testTime);
+        map.put("all", allTime);
         return AppResponse.ok(map);
     }
 
@@ -78,14 +81,29 @@ public class StudyReportController extends ApiController {
         Page<?> studyReport = null;
         Integer userId = getUserId();
         //自主测试学习记录
-        if(type.equals(0)){
+        if (type.equals(0)) {
             studyReport = studyTestRecordsService.getTestResult(ApiPageFactory.getPage(), userId);
-        }else if(type.equals(1)){
+        } else if (type.equals(1)) {
             //课本单元学习记录
-            studyReport = studyBookRateService.bookStudyReport(ApiPageFactory.getPage(),userId);
+            studyReport = studyBookRateService.bookStudyReport(ApiPageFactory.getPage(), userId);
         }
         Map<String, Page<?>> map = new HashMap<>(2);
         map.put("testResult", studyReport);
+        return AppResponse.ok(map);
+    }
+
+
+    /**
+     * 测试列表
+     *
+     * @return
+     */
+    @GetMapping("/testResult")
+    @Transactional
+    public Object testResult() {
+        Page<TestResultDto> testResult = studyTestRecordsService.getTestResult(ApiPageFactory.getPage(), getUserId());
+        Map<String, Page<TestResultDto>> map = new HashMap<>(2);
+        map.put("testResult", testResult);
         return AppResponse.ok(map);
     }
 }

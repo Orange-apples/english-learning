@@ -70,7 +70,10 @@ public class WordsServiceImpl extends ServiceImpl<WordsMapper, Words> implements
 
         int lastGroups = (typeSize - 1) * groupSize;
         Map map3 = getTestWords(testWords.subList(lastGroups, size), form.getAutoTestType().get(typeSize - 1));
-        map.put((String) map3.get("key"), (List<TestWordsDto>) map3.get("value"));
+        List<TestWordsDto> list = (List<TestWordsDto>) map3.get("value");
+        HashSet<TestWordsDto> set = new HashSet<>(list);
+        list = new ArrayList<>(set);
+        map.put((String) map3.get("key"), list);
 
         return map;
     }
@@ -170,6 +173,9 @@ public class WordsServiceImpl extends ServiceImpl<WordsMapper, Words> implements
      * @return
      */
     private String addBlurWord(TestWordsDto testWordsDto, List<WordsDto> wordsDtos, BlurWord blurWord, boolean isChToEn) {
+        if (blurWord.blurIndex >= wordsDtos.size()) {
+            blurWord.blurIndex = wordsDtos.size() - 1;
+        }
         WordsDto wordsDto = wordsDtos.get(blurWord.blurIndex);
         if (wordsDto.getWordId().equals(testWordsDto.getWordId())) {
             //随机到正确答案，下标+1
