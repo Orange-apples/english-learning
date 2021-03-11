@@ -101,7 +101,7 @@ public class UserController extends ApiController {
         if (wxOpenId != null) {
             WXPushMessage message = new WXPushMessage();
             message.openId = wxOpenId;
-            message.text = String.format("尊敬的家长您好，您的账号已开通课程【%s】，请积极监督孩子学习", bookInfo.getName()) ;
+            message.text = String.format("尊敬的家长您好，您的账号已开通课程【%s】，请积极监督孩子学习", bookInfo.getName());
             mqService.sendMsgToMQ("cxylm.wx.push", message);
         }
         return SUCCESS;
@@ -135,7 +135,7 @@ public class UserController extends ApiController {
             if (wxOpenId != null) {
                 WXPushMessage message = new WXPushMessage();
                 message.openId = wxOpenId;
-                message.text = String.format("尊敬的家长您好，您已开通课程【%s】，请积极监督孩子学习", bookInfo.getName()) ;
+                message.text = String.format("尊敬的家长您好，您已开通课程【%s】，请积极监督孩子学习", bookInfo.getName());
                 mqService.sendMsgToMQ("cxylm.wx.push", message);
             }
         }
@@ -162,6 +162,17 @@ public class UserController extends ApiController {
     @PutMapping("/user/managerUpdateUser")
     public Object managerUpdateStore(@RequestBody @Validated UserStateForm form) {
         appUserService.blockOrRecover(form.getUserId(), form.getState());
+        AppUser byId = appUserService.getById(form.getUserId());
+        if (byId != null) {
+            String wxOpenId = byId.getWxOpenId();
+            if (wxOpenId != null) {
+                String mark = form.getState().getValue() == 1 ? "您的账户【" + byId.getUsername() + "】已被封禁" : "您的账户【" + byId.getUsername() + "】已解封";
+                WXPushMessage message = new WXPushMessage();
+                message.openId = wxOpenId;
+                message.text = String.format(mark);
+                mqService.sendMsgToMQ("cxylm.wx.push", message);
+            }
+        }
         return SUCCESS;
     }
 }
