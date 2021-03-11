@@ -93,4 +93,12 @@
         from study_word_records
         where word_id in (#{wordsList})
     </select>
+    <select id="studentTestRecord" resultType="com.cxylm.springboot.dto.wordRecord.StudentTestRecordDto">
+        select
+               DATE_FORMAT(create_time,'%Y-%m-%d')  date,
+               count(id) count,
+               65 score,
+               1 'type',
+                sum(memory_time-create_time)/60 time from study_word_records where user_id=#{id} group by date
+    </select>
 </mapper>

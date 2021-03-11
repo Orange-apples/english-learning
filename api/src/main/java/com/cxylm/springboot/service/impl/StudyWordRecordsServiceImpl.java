@@ -9,6 +9,7 @@ import com.cxylm.springboot.dto.form.StudyForm;
 import com.cxylm.springboot.dto.form.StudySaveForm;
 import com.cxylm.springboot.dto.form.StudySaveWordsForm;
 import com.cxylm.springboot.dto.result.WordsDto;
+import com.cxylm.springboot.dto.wordRecord.StudentTestRecordDto;
 import com.cxylm.springboot.enums.MemoryLevel;
 import com.cxylm.springboot.enums.StudyRateState;
 import com.cxylm.springboot.enums.WordBookType;
@@ -187,5 +188,10 @@ public class StudyWordRecordsServiceImpl extends ServiceImpl<StudyWordRecordsMap
     @Override
     public Integer checkReview(Integer userId) {
         return baseMapper.checkReview(userId);
+    }
+
+    @Override
+    public Page<StudentTestRecordDto> studentTestRecord(Page<Object> page, Integer id) {
+        return baseMapper.studentTestRecord(page, id);
     }
 }

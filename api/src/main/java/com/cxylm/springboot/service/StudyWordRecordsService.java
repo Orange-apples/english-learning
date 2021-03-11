@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cxylm.springboot.dto.form.StudyForm;
 import com.cxylm.springboot.dto.form.StudySaveForm;
 import com.cxylm.springboot.dto.result.WordsDto;
+import com.cxylm.springboot.dto.wordRecord.StudentTestRecordDto;
 import com.cxylm.springboot.enums.WordBookType;
 import com.cxylm.springboot.model.StudyBookRate;
 import com.cxylm.springboot.model.StudyWordRecords;
@@ -67,4 +68,6 @@ public interface StudyWordRecordsService extends IService<StudyWordRecords> {
      * @return
      */
     Integer checkReview(Integer userId);
+
+    Page<StudentTestRecordDto> studentTestRecord(Page<Object> page, Integer id);
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cxylm.springboot.dto.form.StudyForm;
 import com.cxylm.springboot.dto.form.StudySaveWordsForm;
 import com.cxylm.springboot.dto.result.WordsDto;
+import com.cxylm.springboot.dto.wordRecord.StudentTestRecordDto;
 import com.cxylm.springboot.model.StudyWordRecords;
 import org.apache.ibatis.annotations.Param;
 
@@ -80,4 +81,6 @@ public interface StudyWordRecordsMapper extends BaseMapper<StudyWordRecords> {
     Integer checkReview(@Param("userId") Integer userId);
 
     List<StudyWordRecords> selectByWordsList(@Param("wordsList") List<Integer> wordsList);
+
+    Page<StudentTestRecordDto> studentTestRecord(Page<Object> page, Integer id);
 }

@@ -1,5 +1,6 @@
 package com.cxylm.springboot.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cxylm.springboot.annotation.PublicAPI;
@@ -10,16 +11,19 @@ import com.cxylm.springboot.dto.form.PasswordResetForm;
 import com.cxylm.springboot.dto.form.UserRegisterForm;
 import com.cxylm.springboot.dto.result.AppuserDto;
 import com.cxylm.springboot.dto.result.LoginRecordDto;
+import com.cxylm.springboot.dto.wordRecord.StudentTestRecordDto;
 import com.cxylm.springboot.enums.AccountState;
 import com.cxylm.springboot.enums.AccountType;
 import com.cxylm.springboot.exception.AppBizException;
 import com.cxylm.springboot.factory.ApiPageFactory;
 import com.cxylm.springboot.model.AppUser;
 import com.cxylm.springboot.model.LoginRecord;
+import com.cxylm.springboot.model.StudyWordRecords;
 import com.cxylm.springboot.response.AppResponse;
 import com.cxylm.springboot.service.AppUserService;
 import com.cxylm.springboot.service.LoginRecordService;
 import com.cxylm.springboot.service.SMSService;
+import com.cxylm.springboot.service.StudyWordRecordsService;
 import com.cxylm.springboot.util.AssertUtil;
 import com.cxylm.springboot.validator.group.PasswordLoginGroup;
 import com.cxylm.springboot.validator.group.SMSLoginGroup;
@@ -36,6 +40,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.groups.Default;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -54,6 +59,7 @@ public class MasterController extends ApiController {
     private final AppUserService appUserService;
     private final LoginRecordService loginRecordService;
     private final SMSService smsService;
+    private final StudyWordRecordsService wordRecordsService;
 
     @PostMapping(value = "/register")
     @PublicAPI
@@ -76,7 +82,7 @@ public class MasterController extends ApiController {
             }
         }
         final String token = jwtTokenUtil.generateToken(appUser.getId());
-        return AppResponse.ok(new JwtResponse(token, appUser.getId(),appUser));
+        return AppResponse.ok(new JwtResponse(token, appUser.getId(), appUser));
     }
 
     /**
@@ -95,7 +101,7 @@ public class MasterController extends ApiController {
 
         // TODO: 2020/3/17  校长端不保存登录记录
         //loginRecordService.addLoginRecord(appUser.getId());
-        return AppResponse.ok(new JwtResponse(token, appUser.getId(),appUser));
+        return AppResponse.ok(new JwtResponse(token, appUser.getId(), appUser));
     }
 
     @PostMapping(value = "/user/password/reset")
@@ -125,20 +131,21 @@ public class MasterController extends ApiController {
 
         // TODO: 2020/3/17  校长端不保存登录记录 
         //loginRecordService.addLoginRecord(appUser.getId());
-        return AppResponse.ok(new JwtResponse(token, appUser.getId(),appUser));
+        return AppResponse.ok(new JwtResponse(token, appUser.getId(), appUser));
     }
 
     /**
      * 学员访问统计
+     *
      * @param nickName
      * @return
      */
     @GetMapping(value = "/studentCount")
-    public ResponseEntity<?> studentCount(String nickName){
+    public ResponseEntity<?> studentCount(String nickName) {
         Integer userId = getUserId();
         //学员总量
-        Integer totalCount = appUserService.count(new QueryWrapper<AppUser>().eq("school_id", userId).ne("account_state",AccountState.LOGOUT.getValue())
-                                            .eq("merchant",AccountType.STUDENT.getValue()));
+        Integer totalCount = appUserService.count(new QueryWrapper<AppUser>().eq("school_id", userId).ne("account_state", AccountState.LOGOUT.getValue())
+                .eq("merchant", AccountType.STUDENT.getValue()));
 
         //当日新增学员数量
         Integer todayCount = appUserService.todayIncrese(AccountState.LOGOUT.getValue(), AccountType.STUDENT.getValue(), userId);
@@ -148,26 +155,27 @@ public class MasterController extends ApiController {
                 AccountState.LOGOUT.getValue(), AccountType.STUDENT.getValue());
 
         Map map = new HashMap();
-        map.put("totalCount",totalCount);
-        map.put("todayCount",todayCount);
-        map.put("userList",userList);
+        map.put("totalCount", totalCount);
+        map.put("todayCount", todayCount);
+        map.put("userList", userList);
         return AppResponse.ok(map);
     }
 
     /**
      * 学生访问记录
+     *
      * @param userId
      * @return
      */
     @GetMapping(value = "/studentVisitDetail")
-    public ResponseEntity<?> studentVisitDetail(Integer userId){
-        if (userId == null){
+    public ResponseEntity<?> studentVisitDetail(Integer userId) {
+        if (userId == null) {
             return AppResponse.badRequest("请求错误");
         }
 
         //学员信息（昵称 注册日期 照片  ）
         AppUser user = appUserService.getById(userId);
-        if (user == null ){
+        if (user == null) {
             return AppResponse.badRequest("该用户不存在");
         }
 //        else if (user.getMerchant() != AccountType.MASTER){
@@ -175,24 +183,25 @@ public class MasterController extends ApiController {
 //        }
 
         //学员访问记录（日期  访问次数）
-        Page<LoginRecordDto> recordList = loginRecordService.selectRecordDetail(ApiPageFactory.getPage(),userId);
+        Page<LoginRecordDto> recordList = loginRecordService.selectRecordDetail(ApiPageFactory.getPage(), userId);
 
         Map map = new HashMap();
-        map.put("user",user);
-        map.put("recordList",recordList);
+        map.put("user", user);
+        map.put("recordList", recordList);
         return AppResponse.ok(map);
     }
 
     /**
      * 学生使用统计
+     *
      * @return
      */
     @PublicAPI
     @GetMapping(value = "/studentUseCount")
-    public ResponseEntity<?> studentUseCount(){
+    public ResponseEntity<?> studentUseCount() {
         Integer userId = getUserId();
         //累计使用人数
-        Integer totalCount  = loginRecordService.count(new QueryWrapper<LoginRecord>().eq("school_id", userId));
+        Integer totalCount = loginRecordService.count(new QueryWrapper<LoginRecord>().eq("school_id", userId));
 
         //今日使用人数
         Integer todayCount = loginRecordService.selectTodayUse(userId);
@@ -201,10 +210,28 @@ public class MasterController extends ApiController {
         Page<LoginRecordDto> recordList = loginRecordService.selectRecordList(ApiPageFactory.getPage());
 
         Map map = new HashMap();
-        map.put("totalCount",totalCount);
-        map.put("todayCount",todayCount);
-        map.put("recordList",recordList);
+        map.put("totalCount", totalCount);
+        map.put("todayCount", todayCount);
+        map.put("recordList", recordList);
         return AppResponse.ok(map);
+    }
+
+    /**
+     * 学员访问记录
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("studentTestRecord/{id}")
+    public ResponseEntity<?> studentTestRecord(@PathVariable("id") Integer id) {
+        Page<Object> page = ApiPageFactory.getPage();
+        long size = page.getSize();
+        long current = page.getCurrent();
+        Page<StudentTestRecordDto> page1 = wordRecordsService.studentTestRecord(page, id);
+        HashMap<Object, Object> map = new HashMap<>();
+        map.put("totalCount", page1.getTotal());
+        map.put("recordList", page1.getRecords());
+        return ResponseEntity.ok(map);
     }
 
     @Data
