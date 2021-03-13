@@ -1,13 +1,17 @@
 package com.cxylm.springboot.service.impl;
 
 import cn.hutool.crypto.digest.DigestUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cxylm.springboot.constant.CacheName;
 import com.cxylm.springboot.dao.SysUserMapper;
+import com.cxylm.springboot.dto.UserUpdatePwdDto;
 import com.cxylm.springboot.enums.AccountState;
+import com.cxylm.springboot.exception.AppBadRequestException;
 import com.cxylm.springboot.model.system.Menu;
 import com.cxylm.springboot.model.system.Role;
 import com.cxylm.springboot.model.system.User;
@@ -168,5 +172,25 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
         sysUserRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", userId));
         // TODO clear cache
         return AppResponse.ok();
+    }
+
+    @Override
+    public String findPwd(String userName, Integer type) {
+        User one = this.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, userName));
+        if (one == null) throw new AppBadRequestException("未找到此账户的信息");
+        return type == 1 ? one.getEmail() : one.getPhone();
+    }
+
+    @Override
+    public void UpdatePwd(UserUpdatePwdDto userUpdatePwdDto) {
+        String code = userUpdatePwdDto.getCode();
+        ///验证code
+        List<User> list = this.list(new LambdaQueryWrapper<User>().eq(User::getUsername, userUpdatePwdDto.getUsername()));
+        if (list == null || list.isEmpty())
+            throw new AppBadRequestException("未找到用户名为" + userUpdatePwdDto.getUsername() + "的用户");
+
+        UpdateWrapper<User> set = new UpdateWrapper<User>().eq("username", userUpdatePwdDto.getUsername())
+                .set("password", DigestUtil.sha256Hex(userUpdatePwdDto.getNewPwd() + list.get(0).getSalt()));
+        this.update(set);
     }
 }

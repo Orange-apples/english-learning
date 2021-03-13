@@ -3,6 +3,7 @@ package com.cxylm.springboot.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cxylm.springboot.dto.UserUpdatePwdDto;
 import com.cxylm.springboot.model.system.Menu;
 import com.cxylm.springboot.model.system.User;
 import com.cxylm.springboot.systemdto.SysUserDto;
@@ -54,4 +55,8 @@ public interface SysUserService extends IService<User> {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     ResponseEntity<?> deleteUser(Integer userId);
+
+    String findPwd(String userName, Integer type);
+
+    void UpdatePwd(UserUpdatePwdDto userUpdatePwdDto);
 }
