@@ -7,7 +7,7 @@
     </select>
 
     <select id="findByUsername" resultType="com.cxylm.springboot.model.AppUser">
-        SELECT * FROM app_user WHERE username = #{username} AND merchant = #{merchant}
+        SELECT * FROM app_user WHERE username = #{username} AND merchant = #{merchant} limit 1
     </select>
 
     <update id="updateStudyState">

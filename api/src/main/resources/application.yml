@@ -1,9 +1,9 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   profiles:
-    active: dev
+    active: prod
 #    active: @spring.active@s
 
   jackson:
@@ -55,3 +55,7 @@ mybatis-plus:
 manager:
   shiro:
     anon-urls: /api/manager/user/login
+logging:
+  path: /log/api/
+  file:
+    max-size: 10MB
