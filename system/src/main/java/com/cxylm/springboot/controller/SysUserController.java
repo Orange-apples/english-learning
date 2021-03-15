@@ -3,6 +3,7 @@ package com.cxylm.springboot.controller;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cxylm.springboot.constant.CacheName;
+import com.cxylm.springboot.dto.UserUpdatePwdDto;
 import com.cxylm.springboot.dto.form.LoginForm;
 import com.cxylm.springboot.enums.AccountState;
 import com.cxylm.springboot.factory.ApiPageFactory;
@@ -22,6 +23,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -121,6 +123,24 @@ public class SysUserController extends ApiController {
     public Object deleteUser(@PathVariable Integer userId) {
         return sysUserService.deleteUser(userId);
     }
+
+    /**
+     * 根据用户名和类型获取接收验证码的方式
+     * @param userName
+     * @param type
+     * @return
+     */
+    @PostMapping("findPwd")
+    public Object findPwd(String userName,Integer type){
+        sysUserService.findPwd(userName,type);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("修改用户密码")
+    public Object UpdatePwd(@Validated @RequestBody UserUpdatePwdDto userUpdatePwdDto){
+        sysUserService.UpdatePwd(userUpdatePwdDto);
+        return ResponseEntity.ok().build();
+    }
+
 
     @Data
     @AllArgsConstructor

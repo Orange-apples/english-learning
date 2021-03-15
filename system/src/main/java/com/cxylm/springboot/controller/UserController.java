@@ -74,6 +74,12 @@ public class UserController extends ApiController {
         return AppResponse.ok(appUser);
     }
 
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity del(@PathVariable("id") Integer id) {
+        appUserService.removeById(id);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/user/{userId}/opened-course")
     public ResponseEntity<?> getUserOpenedCourse(@PathVariable Integer userId) {
         List<MyBooksDto> myBooks = studyBookRateService.getMyBooks(userId);
