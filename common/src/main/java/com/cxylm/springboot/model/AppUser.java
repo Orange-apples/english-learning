@@ -147,4 +147,8 @@ public class AppUser extends Model<AppUser> {
      * 上次复习时间
      */
     private Long lastReviewTime;
+    /**
+     * 上次登录时间
+     */
+    private Date lastLoginTime;
 }

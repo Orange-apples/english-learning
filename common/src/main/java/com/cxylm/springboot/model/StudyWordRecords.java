@@ -60,4 +60,6 @@ public class StudyWordRecords extends Model<StudyWordRecords> {
      * 测试次数
      */
     private Integer testTimes;
+
+    private Date createTime;
 }
