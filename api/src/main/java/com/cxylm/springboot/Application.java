@@ -24,7 +24,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
-@MapperScan(basePackages = {"com.cxylm.springboot.dao", "com.cxylm.springboot.system.dao"})
+@MapperScan(basePackages = {"com.cxylm.springboot.dao"})
 @EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP,
         basePackages = {"com.cxylm.springboot.repository.redis"})
 // Elasticsearch数据库 Repo 配置，启用请放开注释

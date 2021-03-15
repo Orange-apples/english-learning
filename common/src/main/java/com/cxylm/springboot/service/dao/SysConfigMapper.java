@@ -1,4 +1,4 @@
-package com.cxylm.springboot.dao;
+package com.cxylm.springboot.service.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cxylm.springboot.model.StudyWordRecords;
