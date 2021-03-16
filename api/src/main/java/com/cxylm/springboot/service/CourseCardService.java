@@ -12,4 +12,8 @@ public interface CourseCardService extends IService<CourseCard> {
     void bindBdToUser(Long cardId,Integer userId);
 
     boolean incUseCount(Long cardId);
+
+
+
+
 }

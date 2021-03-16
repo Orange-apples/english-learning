@@ -91,12 +91,13 @@ public class BooksController extends ApiController {
         Integer userId = getUserId();
         int tryCourseCount = studyBookRateService.getTryCourseCount(userId);
         JSONObject returnJson = (JSONObject) JSON.toJSON(books);
-        returnJson.put("tryCourseCount",tryCourseCount);
+        returnJson.put("tryCourseCount", tryCourseCount);
         return AppResponse.ok(returnJson);
     }
 
     /**
      * 用户选课界面
+     *
      * @param form
      * @return
      */
@@ -108,7 +109,7 @@ public class BooksController extends ApiController {
         Integer userId = getUserId();
         int tryCourseCount = studyBookRateService.getTryCourseCount(userId);
         JSONObject returnJson = (JSONObject) JSON.toJSON(books);
-        returnJson.put("tryCourseCount",tryCourseCount);
+        returnJson.put("tryCourseCount", tryCourseCount);
         return AppResponse.ok(returnJson);
     }
 
@@ -162,7 +163,7 @@ public class BooksController extends ApiController {
             if (!isLocked) {
                 return AppResponse.badRequest("服务器繁忙，请稍后再试");
             }
-            boolean state = studyBookRateService.checkOpenState(bookId, userId,0);
+            boolean state = studyBookRateService.checkOpenState(bookId, userId, 0);
             if (state) {
                 throw new AppBadRequestException("该课程已经开通了");
             }
@@ -172,9 +173,9 @@ public class BooksController extends ApiController {
             studyBookRateService.OpenCourse(bookId, userId, expireTime);
 
             AppUser appUser = appUserService.getById(getUserId());
-            if (appUser != null && appUser.getBdCode() != null) {
+            if (appUser != null) {
                 CourseOpenRecord record = new CourseOpenRecord();
-                record.setBdId(appUser.getBdCode());
+                record.setBdId(courseCard.getSysBdId());
                 record.setCourseId(bookId);
                 record.setUserId(userId);
                 record.setCoursePrice(bookInfo.getPrice());
@@ -184,8 +185,11 @@ public class BooksController extends ApiController {
             courseCard.setUsed(true);
             //courseCard.updateById();
             //将卡券绑定的业务员绑定到用户上
-            courseCardService.bindBdToUser(courseCard.getId(),userId);
+            if (appUser != null && appUser.getBdCode() == null) {
+                courseCardService.bindBdToUser(courseCard.getId(), userId);
+            }
             courseCardService.incUseCount(courseCard.getId());
+
         } catch (InterruptedException e) {
             log.error("Error while getting COURSE_LOCK redis lock.", e);
             return AppResponse.badRequest("服务器繁忙，请稍后再试");
@@ -248,11 +252,12 @@ public class BooksController extends ApiController {
 
     /**
      * 提前开通课程
+     *
      * @return
      */
     @PostMapping("/buyUnit")
-    public Object buyUnit(@RequestBody BookRateDto bookRateDto){
+    public Object buyUnit(@RequestBody BookRateDto bookRateDto) {
         Integer userId = getUserId();
-        return studyBookRateService.buyUnit(bookRateDto.getBookId(),userId,bookRateDto.getUnitId());
+        return studyBookRateService.buyUnit(bookRateDto.getBookId(), userId, bookRateDto.getUnitId());
     }
 }
