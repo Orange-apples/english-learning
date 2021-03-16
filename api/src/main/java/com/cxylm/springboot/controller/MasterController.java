@@ -14,6 +14,7 @@ import com.cxylm.springboot.dto.result.LoginRecordDto;
 import com.cxylm.springboot.dto.wordRecord.StudentTestRecordDto;
 import com.cxylm.springboot.enums.AccountState;
 import com.cxylm.springboot.enums.AccountType;
+import com.cxylm.springboot.enums.SchoolEnum;
 import com.cxylm.springboot.exception.AppBizException;
 import com.cxylm.springboot.factory.ApiPageFactory;
 import com.cxylm.springboot.model.AppUser;
@@ -95,6 +96,10 @@ public class MasterController extends ApiController {
         if (appUser == null || appUser.getMerchant() != AccountType.MASTER) {
             log.info("该账号不是校长身份账号,检查用户merchant字段");
             return AppResponse.badRequest("用户名或密码错误");
+        }
+
+        if(!appUser.getSchoolState().equals(SchoolEnum.SCHOOL_ENABLE_1.getValue())){
+            return AppResponse.badRequest("该校区账户已被禁用，请联系管理员");
         }
         final String token = jwtTokenUtil.generateToken(appUser.getId());
         log.info("用户{}登录成功, IP地址{}", loginForm.getUsername(), getIP());

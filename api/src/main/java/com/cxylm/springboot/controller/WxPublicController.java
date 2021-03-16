@@ -35,6 +35,4 @@ public class WxPublicController {
         wxPublicService.pushReportById(id);
         return ResponseEntity.ok("");
     }
-
-
 }

@@ -51,6 +51,8 @@ logging:
           elasticsearch:
             core: DEBUG
   path: /log/cxylm-api
+server:
+  port: 8081
 
 
 

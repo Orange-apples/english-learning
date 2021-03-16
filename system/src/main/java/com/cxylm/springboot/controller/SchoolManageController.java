@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cxylm.springboot.dto.form.SchoolRegisterForm;
 import com.cxylm.springboot.dto.form.SchoolSearchForm;
 import com.cxylm.springboot.enums.AccountType;
+import com.cxylm.springboot.enums.SchoolEnum;
+import com.cxylm.springboot.exception.AppBadRequestException;
 import com.cxylm.springboot.factory.ApiPageFactory;
 import com.cxylm.springboot.model.AppUser;
 import com.cxylm.springboot.model.School;
@@ -36,6 +38,18 @@ public class SchoolManageController extends ApiController {
 //        BeanUtils.copyProperties(form, school);
 //        school.insert();
         appUserService.registerSchoolUser(form);
+        return SUCCESS;
+    }
+
+    @GetMapping("setState")
+    @RequiresPermissions("school:update")
+    public Object enableSchool(Integer id) {
+        AppUser user = appUserService.getById(id);
+        if (user == null) {
+            throw new AppBadRequestException("未找到此记录");
+        }
+        user.setSchoolState(user.getSchoolState().equals(SchoolEnum.SCHOOL_ENABLE_0.getValue()) ? SchoolEnum.SCHOOL_ENABLE_1.getValue() : SchoolEnum.SCHOOL_ENABLE_0.getValue());
+        appUserService.updateById(user);
         return SUCCESS;
     }
 

@@ -140,6 +140,7 @@ public class AppUser extends Model<AppUser> {
     private Integer bdCode;
     private String schoolName;
     private String schoolAddr;
+    private Integer schoolState;
     private String wxOpenId;
     private Long expire;
 

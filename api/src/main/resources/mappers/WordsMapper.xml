@@ -25,11 +25,11 @@
 <!--        LIMIT #{limit_size}-->
 <!--    </select>-->
     <select id="getTestWords" resultType="com.cxylm.springboot.dto.result.TestWordsDto">
-        select swr.word_id, words.mean as question, words.word, words.book_id,
+        select distinct swr.word_id, words.mean as question, words.word, words.book_id,
         (10-datediff(now(),last_error_time))/5+level as levels
         from words right join study_word_records swr on words.id = swr.word_id
         where swr.user_id = #{userId}
-        order by swr.test_times, levels, swr.error_times desc, swr.last_error_time desc
+        order by /*swr.test_times, levels, swr.error_times desc, swr.last_error_time desc*/ RAND()
         limit #{form.size}
     </select>
 

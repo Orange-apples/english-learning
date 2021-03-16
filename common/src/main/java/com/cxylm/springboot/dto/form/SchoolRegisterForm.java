@@ -6,31 +6,32 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 
 /**
  * 词库添加
  */
 @Getter
 @Setter
-public class SchoolRegisterForm {
+public class SchoolRegisterForm implements Serializable {
 
     private Integer id;
 
-    @NotBlank(message = "请输入密码")
+    @NotBlank(message = "请输入用户名")
     private String username;
+
     @NotBlank(message = "请输入密码")
     private String pwd;
 
+    @MobilePhone
+    @NotBlank(message = "手机号码不能为空")
+    private String mobile;
     /**
      * 校区名称
      */
     @NotBlank(message = "请输入校名称")
     @Length(max = 32, message = "校名称不能超过32个字")
     private String schoolName;
-
-    @MobilePhone
-    private String mobile;
-
     /**
      * 地址
      */

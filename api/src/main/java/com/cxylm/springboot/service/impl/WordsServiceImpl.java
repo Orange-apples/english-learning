@@ -174,7 +174,7 @@ public class WordsServiceImpl extends ServiceImpl<WordsMapper, Words> implements
      */
     private String addBlurWord(TestWordsDto testWordsDto, List<WordsDto> wordsDtos, BlurWord blurWord, boolean isChToEn) {
         if (blurWord.blurIndex >= wordsDtos.size()) {
-            blurWord.blurIndex = wordsDtos.size() - 1;
+           return null ;
         }
         WordsDto wordsDto = wordsDtos.get(blurWord.blurIndex);
         if (wordsDto.getWordId().equals(testWordsDto.getWordId())) {
