@@ -2,6 +2,7 @@ package com.cxylm.springboot.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cxylm.springboot.annotation.PublicAPI;
@@ -15,10 +16,7 @@ import com.cxylm.springboot.dto.result.MyBooksDto;
 import com.cxylm.springboot.enums.BookLevel;
 import com.cxylm.springboot.exception.AppBadRequestException;
 import com.cxylm.springboot.factory.ApiPageFactory;
-import com.cxylm.springboot.model.AppUser;
-import com.cxylm.springboot.model.BookInfo;
-import com.cxylm.springboot.model.CourseCard;
-import com.cxylm.springboot.model.CourseOpenRecord;
+import com.cxylm.springboot.model.*;
 import com.cxylm.springboot.response.AppResponse;
 import com.cxylm.springboot.service.*;
 import com.cxylm.springboot.util.AssertUtil;
@@ -188,8 +186,17 @@ public class BooksController extends ApiController {
             if (appUser != null && appUser.getBdCode() == null) {
                 courseCardService.bindBdToUser(courseCard.getId(), userId);
             }
+            List<CourseCardBind> bindList = courseCardBindServiceService.list(new LambdaQueryWrapper<CourseCardBind>()
+                    .eq(CourseCardBind::getBookId, bookId)
+                    .eq(CourseCardBind::getCardId, courseCard.getId()));
+            //开通之后绑定用户
+            if (bindList != null && !bindList.isEmpty()) {
+                CourseCardBind courseCardBind = bindList.get(0);
+                courseCardBind.setBindUserId(userId);
+                courseCardBindServiceService.updateById(courseCardBind);
+            }
             courseCardService.incUseCount(courseCard.getId());
-
+            courseCardService.checkState(courseCard.getId());
         } catch (InterruptedException e) {
             log.error("Error while getting COURSE_LOCK redis lock.", e);
             return AppResponse.badRequest("服务器繁忙，请稍后再试");

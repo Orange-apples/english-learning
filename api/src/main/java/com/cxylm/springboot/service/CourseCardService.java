@@ -14,6 +14,5 @@ public interface CourseCardService extends IService<CourseCard> {
     boolean incUseCount(Long cardId);
 
 
-
-
+    void checkState(Long id);
 }
