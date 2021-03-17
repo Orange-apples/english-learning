@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cxylm.springboot.dto.result.LoginRecordDto;
 import com.cxylm.springboot.model.LoginRecord;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,4 +39,6 @@ public interface LoginRecordService extends IService<LoginRecord> {
      * @param userId
      */
     void addLoginRecord(Integer userId, Integer schoolId);
+
+    Date getLastLoginTime(Integer userId);
 }

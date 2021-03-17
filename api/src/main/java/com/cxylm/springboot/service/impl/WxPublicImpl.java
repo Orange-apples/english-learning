@@ -10,10 +10,7 @@ import com.cxylm.springboot.exception.AppBadRequestException;
 import com.cxylm.springboot.model.AppUser;
 import com.cxylm.springboot.model.StudyTestRecords;
 import com.cxylm.springboot.model.StudyWordRecords;
-import com.cxylm.springboot.service.AppUserService;
-import com.cxylm.springboot.service.StudyTestRecordsService;
-import com.cxylm.springboot.service.StudyWordRecordsService;
-import com.cxylm.springboot.service.WxPublicService;
+import com.cxylm.springboot.service.*;
 import com.cxylm.springboot.service.mq.MQService;
 import com.cxylm.springboot.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +35,8 @@ public class WxPublicImpl implements WxPublicService {
     StudyTestRecordsService studyTestRecordsService;
     @Autowired
     MQService mqService;
+    @Autowired
+    LoginRecordService loginRecordService;
 
     //向所有用户推送
     public void pushReportAll() {
@@ -63,8 +62,13 @@ public class WxPublicImpl implements WxPublicService {
             throw new AppBadRequestException("该账户未绑定微信无法推送");
         }
         pusStr.append(user.getUsername()).append("】\n");
-        Date lastLoginTime = user.getLastLoginTime();
+        Date lastLoginTime = loginRecordService.getLastLoginTime(uid);
         pusStr.append("最后登录时间：").append(DateUtil.format(lastLoginTime, "yyyy-MM-dd HH:mm")).append("\n");
+        Integer spellTime = user.getSpellTime();
+        Integer learningTime = user.getLearningTime();
+        Integer testTime = user.getTestTime();
+        int i = (spellTime + learningTime + testTime) / 60;
+        pusStr.append("累计学习时间：【").append(i).append("】").append("分钟\n");
         //昨日学习单词数量
         int count = studyWordRecordsService.count(new LambdaQueryWrapper<StudyWordRecords>()
                 .eq(StudyWordRecords::getUserId, user.getId())
