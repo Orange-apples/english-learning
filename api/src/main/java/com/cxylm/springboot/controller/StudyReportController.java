@@ -1,7 +1,6 @@
 package com.cxylm.springboot.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cxylm.springboot.annotation.PublicAPI;
 import com.cxylm.springboot.dto.result.TestResultDto;
 import com.cxylm.springboot.dto.result.XyDateDto;
 import com.cxylm.springboot.factory.ApiPageFactory;
@@ -101,7 +100,6 @@ public class StudyReportController extends ApiController {
      */
     @GetMapping("/testResult")
     @Transactional
-    @PublicAPI
     public Object testResult() {
         Page<TestResultDto> testResult = studyTestRecordsService.getTestResult(ApiPageFactory.getPage(), getUserId());
         Map<String, Page<TestResultDto>> map = new HashMap<>(2);
