@@ -57,4 +57,8 @@ public class TestResultDto extends Model<TestResultDto> {
      * 对应的章节单词数量
      */
     private Integer wordCount;
+    /**
+     * 是否为普通测试
+     */
+    private Integer normalTest;
 }

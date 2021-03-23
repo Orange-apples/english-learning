@@ -42,12 +42,12 @@ public class StudyTestRecordsServiceImpl extends ServiceImpl<StudyTestRecordsMap
      * @param form
      */
     @Override
-    public void saveTestRecords(WordsTestSaveForm form,Integer userId) {
+    public void saveTestRecords(WordsTestSaveForm form, Integer userId) {
         StudyTestRecords studyTestRecords = new StudyTestRecords();
         BeanUtils.copyProperties(form, studyTestRecords);
         studyTestRecords.setCreateTime(new Date());
         studyTestRecords.setUserId(userId);
-        if(form.getAutoTestType()!=null){
+        if (form.getAutoTestType() != null) {
             studyTestRecords.setTestType(form.getAutoTestType().get(0));
         }
         boolean b = studyTestRecords.insert();
@@ -92,15 +92,24 @@ public class StudyTestRecordsServiceImpl extends ServiceImpl<StudyTestRecordsMap
 
         //查询对应的测试单元下的单词列表
         testResult.forEach(r -> {
-            LambdaQueryWrapper<Words> queryWrapper = new LambdaQueryWrapper<Words>()
-                    .eq(Words::getBookId, r.getBookId())
-                    .eq(Words::getUnit, r.getUnitId());
-            int wordCount = wordsService.count(queryWrapper);
-            r.setWordCount(wordCount);
+            Integer value = r.getTestType().getValue();
+            List<Integer> ints = Arrays.asList(1, 2, 3, 4);
+            if (ints.contains(value)) {
+                //普通测试
+                r.setNormalTest(1);
+                r.setWordCount(10);
+            } else {
+                LambdaQueryWrapper<Words> queryWrapper = new LambdaQueryWrapper<Words>()
+                        .eq(Words::getBookId, r.getBookId())
+                        .eq(Words::getUnit, r.getUnitId());
+                int wordCount = wordsService.count(queryWrapper);
+                r.setWordCount(wordCount);
+            }
         });
         page.setRecords(testResult);
         return page;
     }
+
 
     /**
      * 获取对比测试分数

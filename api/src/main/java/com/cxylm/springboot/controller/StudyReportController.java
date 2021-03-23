@@ -102,8 +102,9 @@ public class StudyReportController extends ApiController {
     @Transactional
     public Object testResult() {
         Page<TestResultDto> testResult = studyTestRecordsService.getTestResult(ApiPageFactory.getPage(), getUserId());
-        Map<String, Page<TestResultDto>> map = new HashMap<>(2);
+        Map<String, Page> map = new HashMap<>(2);
         map.put("testResult", testResult);
+        map.put("studyReport", studyBookRateService.bookStudyReport(ApiPageFactory.getPage(), getUserId()));
         return AppResponse.ok(map);
     }
 }
