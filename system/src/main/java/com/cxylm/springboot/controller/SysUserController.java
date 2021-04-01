@@ -119,8 +119,8 @@ public class SysUserController extends ApiController {
     }
 
     @RequiresPermissions("user:delete")
-    @DeleteMapping("/user/{userId}")
-    public Object deleteUser(@PathVariable Integer userId) {
+    @DeleteMapping("/user/del/{userId}")
+    public Object deleteUser(@PathVariable("userId") Integer userId) {
         return sysUserService.deleteUser(userId);
     }
 
