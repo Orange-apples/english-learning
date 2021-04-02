@@ -93,6 +93,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public Object onServerError(RuntimeException e) {
         log.error("服务器异常", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AppErrorResponse("服务器异常"));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AppErrorResponse(e.getMessage()));
     }
 }

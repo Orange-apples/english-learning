@@ -1,7 +1,9 @@
 package com.cxylm.springboot.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.cxylm.springboot.annotation.PublicAPI;
 import com.cxylm.springboot.dto.BDStaDto;
 import com.cxylm.springboot.dto.form.BDForm;
 import com.cxylm.springboot.enums.EnableState;
@@ -19,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 import static com.cxylm.springboot.constant.AppMessage.ERROR_RECORD_NOT_EXIST;
 
@@ -30,10 +33,17 @@ public class BDController extends ApiController {
 
     private final SysBDService bdService;
 
+    @PublicAPI
     @GetMapping("/bds")
-    public ResponseEntity<?> userList() {
+    public ResponseEntity<?> userList(String name, String mobile) {
         QueryWrapper<BD> wrapper = new QueryWrapper<>();
         wrapper.eq("del", EnableState.ENABLED.getValue());
+        if (StrUtil.isNotBlank(name)) {
+            wrapper.like("name", name);
+        }
+        if (StrUtil.isNotBlank(mobile)) {
+            wrapper.like("mobile", mobile);
+        }
         IPage<BD> list = bdService.page(ApiPageFactory.getPage(), wrapper);
         return AppResponse.ok(list);
     }
