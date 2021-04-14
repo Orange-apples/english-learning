@@ -14,7 +14,7 @@
         where swr.user_id = #{userId}
           and swr.level &lt;&gt; 5
           and datediff(now(), swr.memory_time) != 0
-        order by swr.memory_time desc, levels, swr.level, swr.error_times desc, swr.last_error_time desc
+        order by swr.memory_time , levels, swr.level, swr.error_times desc, swr.last_error_time desc
         limit #{maxReviewWord}
     </select>
 
