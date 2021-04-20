@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -59,6 +60,9 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
             LambdaQueryWrapper<Words> queryWrapper = new LambdaQueryWrapper<Words>()
                     .eq(Words::getBookId, e.getBookId())
                     .eq(Words::getUnit, e.getUnitId());
+            if (e.getLastWordsId() != null) {
+                queryWrapper.le(Words::getId, e.getLastWordsId());
+            }
             e.setWordsCount(wordsService.count(queryWrapper));
         });
         page.setRecords(bookStudyReportList);

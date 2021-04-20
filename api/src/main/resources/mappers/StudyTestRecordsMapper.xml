@@ -3,7 +3,7 @@
 <mapper namespace="com.cxylm.springboot.dao.StudyTestRecordsMapper">
 
     <select id="histogram" resultType="com.cxylm.springboot.dto.result.XyDateDto">
-        select left(create_time, 10) xData, count(id) yData
+        select left(create_time, 10) xData, count(DISTINCT word_id) yData
         FROM study_word_records
         where user_id = #{userId}
           and DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= create_time

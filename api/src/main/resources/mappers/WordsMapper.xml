@@ -51,7 +51,7 @@
         select id wordId, mean as question, word, book_id
         from words
         where book_id = #{bookId}
-          and unit = #{unitId}
+          and unit = #{unitId} order by rand()
     </select>
 
     <select id="getUntilTestWords" resultType="com.cxylm.springboot.dto.result.TestWordsDto">

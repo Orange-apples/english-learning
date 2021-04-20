@@ -72,7 +72,6 @@ public class StudyTestRecordsServiceImpl extends ServiceImpl<StudyTestRecordsMap
                 XyDateDto xyDateDto = new XyDateDto();
                 xyDateDto.setXData(DateUtil.format(DateUtil.offsetDay(date, -i), DatePattern.NORM_DATE_PATTERN));
                 xyDateDto.setYData(0);
-
                 histogram.add(xyDateDto);
             }
         }
