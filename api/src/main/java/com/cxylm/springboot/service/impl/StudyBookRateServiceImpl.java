@@ -223,7 +223,7 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
     public List<BooksUnitStateDto> getBookUnitState(Integer bookId, Integer userId) {
         List<BooksUnitStateDto> unitState = baseMapper.getBookUnitState(bookId, userId);
         //查看课程是否为试用
-        Integer isTry = this.getBookIsTry(bookId, userId);
+    /*    Integer isTry = this.getBookIsTry(bookId, userId);
         if (isTry.equals(1)) {
             for (int i = 0; i < unitState.size(); i++) {
                 BooksUnitStateDto unitStateDto = unitState.get(i);
@@ -234,7 +234,7 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
                     unitStateDto.setState(StudyRateState.TRY);
                 }
             }
-        }
+        }*/
         return unitState;
     }
 
