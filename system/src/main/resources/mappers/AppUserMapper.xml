@@ -25,6 +25,7 @@
             <if test="searchForm.state != null and searchForm.state != -1">
                 and au.account_state = #{searchForm.state}
             </if>
+            and au.is_del = 0
         </where>
         order by au.id desc
     </select>
