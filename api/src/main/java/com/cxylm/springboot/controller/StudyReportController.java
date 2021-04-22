@@ -60,7 +60,6 @@ public class StudyReportController extends ApiController {
         Integer spellTime = appUser.getSpellTime();
         Integer testTime = appUser.getTestTime();
         int allTime = learningTime + spellTime + testTime;
-        Double learning = learningTime * 100.0 / allTime;
         Map<String, Integer> map = new HashMap<>(4);
         map.put("learning", learningTime);
         map.put("spell", spellTime);
