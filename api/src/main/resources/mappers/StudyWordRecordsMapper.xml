@@ -60,13 +60,13 @@
             order by swr.level
         </if>
         <if test="type ==2">
-            and swr.level &lt; 8
+            and swr.level &lt;= 8
         </if>
         <if test="type ==3">
             and swr.level in (1,2,3,4)
         </if>
         <if test="type ==4">
-            and swr.level >= 8
+            and swr.level > 8
         </if>
     </select>
 
