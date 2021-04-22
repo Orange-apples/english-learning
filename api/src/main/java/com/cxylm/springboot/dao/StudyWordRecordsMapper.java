@@ -80,7 +80,7 @@ public interface StudyWordRecordsMapper extends BaseMapper<StudyWordRecords> {
      */
     Integer checkReview(@Param("userId") Integer userId);
 
-    List<StudyWordRecords> selectByWordsList(@Param("wordsList") List<Integer> wordsList);
+    List<StudyWordRecords> selectByWordsList(@Param("wordsList") List<Integer> wordsList,@Param("userId")Integer userId);
 
     Page<StudentTestRecordDto> studentTestRecord(Page<Object> page, Integer id);
 }

@@ -91,7 +91,7 @@
     <select id="selectByWordsList" resultType="com.cxylm.springboot.model.StudyWordRecords">
         select *
         from study_word_records
-        where word_id in (#{wordsList})
+        where word_id in (#{wordsList}) and user_id=#{userId}
     </select>
     <select id="studentTestRecord" resultType="com.cxylm.springboot.dto.wordRecord.StudentTestRecordDto">
         select

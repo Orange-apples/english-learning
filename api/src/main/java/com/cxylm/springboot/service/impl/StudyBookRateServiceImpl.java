@@ -17,15 +17,9 @@ import com.cxylm.springboot.enums.StudyType;
 import com.cxylm.springboot.enums.TestType;
 import com.cxylm.springboot.exception.AppBadRequestException;
 import com.cxylm.springboot.exception.AppBizException;
-import com.cxylm.springboot.model.AppUser;
-import com.cxylm.springboot.model.BookInfo;
-import com.cxylm.springboot.model.StudyBookRate;
-import com.cxylm.springboot.model.Words;
+import com.cxylm.springboot.model.*;
 import com.cxylm.springboot.response.AppResponse;
-import com.cxylm.springboot.service.AppUserService;
-import com.cxylm.springboot.service.BooksService;
-import com.cxylm.springboot.service.StudyBookRateService;
-import com.cxylm.springboot.service.WordsService;
+import com.cxylm.springboot.service.*;
 import com.cxylm.springboot.service.mq.MQService;
 import com.cxylm.springboot.util.AssertUtil;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +46,7 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
     private final WordsService wordsService;
     private final BooksService booksService;
     private final AppUserService appUserService;
+    private final StudyTestRecordsService testRecordsService;
 
     @Override
     public Page<BookStudyReport> bookStudyReport(Page<BookStudyReport> page, Integer userId) {
@@ -260,7 +255,7 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
             //状态为测试完成，则修改状态为学习中
             studyBookRate.setState(StudyRateState.TEST_AND_LEARNING);
             b = studyBookRate.updateById();
-        }/*else if(studyBookRate.getState().equals(StudyRateState.WORDS_OVER) || studyBookRate.getState().equals(StudyRateState.TEST_AND_WORDS_OVER)){
+        } /*else if (studyBookRate.getState().equals(StudyRateState.WORDS_OVER) || studyBookRate.getState().equals(StudyRateState.TEST_AND_WORDS_OVER)) {
             log.error("该单元已学习，请勿重复学习！");
             throw new AppBadRequestException("该单元已学习，请勿重复学习！");
         }*/
@@ -375,9 +370,9 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
     @Override
     public void check(StudyBookRate studyBookRate) {
         if (studyBookRate == null || studyBookRate.getState().equals(StudyRateState.CREATE)
-                || studyBookRate.getState().equals(StudyRateState.LEARNING)
-                || studyBookRate.getState().equals(StudyRateState.TEST_AND_CREATE)
-                || studyBookRate.getState().equals(StudyRateState.TEST_AND_LEARNING)) {
+//                || studyBookRate.getState().equals(StudyRateState.LEARNING)
+//                || studyBookRate.getState().equals(StudyRateState.TEST_AND_CREATE)
+            /* || studyBookRate.getState().equals(StudyRateState.TEST_AND_LEARNING)*/) {
             log.error("请求错误：错误码2002（单词学习没有学习，不能进行其他训练和测试）");
             throw new AppBadRequestException("请先进行单词学习！");
         }
@@ -403,6 +398,10 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
                 log.error("请求错误：错误码2004(该课程未完全学习完不能进行一测到底！)");
                 throw new AppBadRequestException("该课程未完全学习完不能进行一测到底！");
             }
+        } else if (TestType.BEFORE_TEST.equals(testType)) {
+            int count = testRecordsService.count(new LambdaQueryWrapper<StudyTestRecords>()
+            .eq(StudyTestRecords::getTestType,TestType.BEFORE_TEST.getValue()));
+            if(count>0) throw new AppBadRequestException("该课程已经进行过学前测试了");
         }
     }
 

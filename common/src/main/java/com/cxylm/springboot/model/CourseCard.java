@@ -34,6 +34,7 @@ public class CourseCard extends Model<CourseCard> {
     private Long expireTime;
     private Integer courseLevel;
     private String coursePublisher;
+    private Integer userId;
 
     /**
      * 业务员id

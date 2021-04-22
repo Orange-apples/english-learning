@@ -14,6 +14,7 @@ import com.cxylm.springboot.dto.result.BooksDto;
 import com.cxylm.springboot.dto.result.BooksUnitStateDto;
 import com.cxylm.springboot.dto.result.MyBooksDto;
 import com.cxylm.springboot.enums.BookLevel;
+import com.cxylm.springboot.enums.StudyRateState;
 import com.cxylm.springboot.exception.AppBadRequestException;
 import com.cxylm.springboot.factory.ApiPageFactory;
 import com.cxylm.springboot.model.*;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/books")
@@ -143,11 +145,10 @@ public class BooksController extends ApiController {
         final Long expireTime = courseCard.getExpireTime();
         if (expireTime != null) AssertUtil.isTrue(expireTime > System.currentTimeMillis(), "该卡已过期");
 
-
         Integer userId = getUserId();
 //        Integer bookId = courseCard.getCourseId();
         Integer bookId = form.getBookId();
-
+        AssertUtil.isTrue(courseCard.getUserId().equals(userId), "该课程已被其他用户绑定");
         BookInfo bookInfo = booksService.getById(bookId);
         AssertUtil.isTrue(bookInfo != null, "课程不存在，请联系平台");
 
@@ -237,6 +238,11 @@ public class BooksController extends ApiController {
     @Transactional
     public Object base(@RequestParam Integer bookId) {
         List<BooksUnitStateDto> base = studyBookRateService.getBookUnitState(bookId, getUserId());
+        base = base.stream().peek(w -> {
+            if (w.getState().getValue() == 1) {
+                w.setState(StudyRateState.CREATE);
+            }
+        }).collect(Collectors.toList());
         Map<String, List<BooksUnitStateDto>> map = new HashMap<>(2);
         map.put("base", base);
         return AppResponse.ok(map);

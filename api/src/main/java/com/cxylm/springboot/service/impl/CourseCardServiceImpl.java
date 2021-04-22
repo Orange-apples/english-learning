@@ -33,6 +33,8 @@ public class CourseCardServiceImpl extends ServiceImpl<CourseCardMapper, CourseC
             //卡券的业务员绑定到用户中
             if (courseCard.getSysBdId() != null) {
                 appUser.setBdCode(courseCard.getSysBdId());
+                courseCard.setUserId(userId);
+                this.updateById(courseCard);
                 appUserService.updateById(appUser);
             }
         }

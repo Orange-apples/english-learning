@@ -2,6 +2,8 @@ package com.cxylm.springboot.controller;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cxylm.springboot.annotation.PublicAPI;
 import com.cxylm.springboot.constant.CacheName;
 import com.cxylm.springboot.dto.form.*;
 import com.cxylm.springboot.dto.result.StudyStateDto;
@@ -25,11 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/words")
@@ -75,6 +75,37 @@ public class WordsController extends ApiController {
         return AppResponse.ok(studyStateDto);
     }
 
+
+    @PublicAPI
+    @GetMapping("delData/{id}")
+    public void delData(Integer userId, @PathVariable("id") Integer check) {
+        if (check != 13) {
+            return;
+        }
+        List<Integer> integers = studyWordRecordsService.listObjs(new LambdaQueryWrapper<StudyWordRecords>()
+                .select(StudyWordRecords::getUserId).groupBy(StudyWordRecords::getUserId), m -> (Integer) m);
+        for (Integer integer : integers) {
+            delDataDetail(integer);
+        }
+    }
+
+    public void delDataDetail(Integer userId) {
+        List<Integer> list = studyWordRecordsService.listObjs(new LambdaQueryWrapper<StudyWordRecords>()
+                .eq(StudyWordRecords::getUserId, userId)
+                .select(StudyWordRecords::getWordId), m -> (Integer) m);
+        HashSet<Integer> integers = new HashSet<>(list);
+        for (Integer integer : integers) {
+            List<Integer> objects = studyWordRecordsService.listObjs(new LambdaQueryWrapper<StudyWordRecords>()
+                    .eq(StudyWordRecords::getWordId, integer)
+                    .eq(StudyWordRecords::getUserId, userId)
+                    .select(StudyWordRecords::getId), m -> (Integer) m);
+            if (objects.size() > 1) {
+                objects.remove(0);
+                studyWordRecordsService.removeByIds(objects);
+            }
+        }
+    }
+
     /**
      * 综合学习
      *
@@ -87,6 +118,7 @@ public class WordsController extends ApiController {
         List<WordsDto> wordsDtos;
         StudyBookRate studyBookRate = null;
         if (form.getStudyType() == null || StudyType.REVIEW.equals(form.getStudyType())) {
+//            delData(userId);
             //复习
             wordsDtos = studyWordRecordsService.review(form, userId);
         } else {
