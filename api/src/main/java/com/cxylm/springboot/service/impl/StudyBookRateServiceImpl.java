@@ -217,6 +217,27 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
     @Override
     public List<BooksUnitStateDto> getBookUnitState(Integer bookId, Integer userId) {
         List<BooksUnitStateDto> unitState = baseMapper.getBookUnitState(bookId, userId);
+
+        for (BooksUnitStateDto m : unitState) {
+            Integer unitId = m.getUnitId();
+            Integer obj = testRecordsService.getObj(new LambdaQueryWrapper<StudyTestRecords>()
+                    .eq(StudyTestRecords::getTestType, TestType.BEFORE_TEST.getValue())
+                    .eq(StudyTestRecords::getUnitId, unitId)
+                    .eq(StudyTestRecords::getUserId, userId)
+                    .last("limit 1")
+                    .orderByDesc(StudyTestRecords::getScore)
+                    .select(StudyTestRecords::getScore), i -> (Integer) i);
+            m.setBeforeScore(obj == null ? 0 : obj);
+
+            Integer after = testRecordsService.getObj(new LambdaQueryWrapper<StudyTestRecords>()
+                    .eq(StudyTestRecords::getTestType, TestType.AFTER_TEST.getValue())
+                    .eq(StudyTestRecords::getUnitId, unitId)
+                    .eq(StudyTestRecords::getUserId, userId)
+                    .last("limit 1")
+                    .orderByDesc(StudyTestRecords::getScore)
+                    .select(StudyTestRecords::getScore), i -> (Integer) i);
+            m.setAfterScore(after == null ? 0 : after);
+        }
         //查看课程是否为试用
     /*    Integer isTry = this.getBookIsTry(bookId, userId);
         if (isTry.equals(1)) {
@@ -400,8 +421,8 @@ public class StudyBookRateServiceImpl extends ServiceImpl<StudyBookRateMapper, S
             }
         } else if (TestType.BEFORE_TEST.equals(testType)) {
             int count = testRecordsService.count(new LambdaQueryWrapper<StudyTestRecords>()
-            .eq(StudyTestRecords::getTestType,TestType.BEFORE_TEST.getValue()));
-            if(count>0) throw new AppBadRequestException("该课程已经进行过学前测试了");
+                    .eq(StudyTestRecords::getTestType, TestType.BEFORE_TEST.getValue()));
+            if (count > 0) throw new AppBadRequestException("该课程已经进行过学前测试了");
         }
     }
 
