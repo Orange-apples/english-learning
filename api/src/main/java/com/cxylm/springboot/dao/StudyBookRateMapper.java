@@ -23,7 +23,7 @@ public interface StudyBookRateMapper extends BaseMapper<StudyBookRate> {
      * @param userId
      * @return
      */
-    @Select("SELECT bi.`name` book_name,sbr.last_words_id,sbr.book_id,sbr.unit_id,IF(sbr.state > 1,'是','否') passed FROM study_book_rate sbr LEFT JOIN book_info bi ON bi.id = sbr.book_id WHERE sbr.user_id = #{userId} AND unit_id <> 0 and last_words_id  is not null order by sbr.create_time desc ")
+    @Select("SELECT bi.`name` book_name,sbr.last_words_id,sbr.book_id,sbr.unit_id,IF(sbr.state > 1,true,false) pass FROM study_book_rate sbr LEFT JOIN book_info bi ON bi.id = sbr.book_id WHERE sbr.user_id = #{userId} AND unit_id <> 0 and last_words_id  is not null order by sbr.create_time desc ")
     List<BookStudyReport> bookStudyReport(Page<BookStudyReport> page, @Param("userId") Integer userId);
 
     /**

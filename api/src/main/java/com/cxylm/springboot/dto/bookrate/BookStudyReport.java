@@ -30,7 +30,7 @@ public class BookStudyReport {
     /**
      * 是否通过
      */
-    private String passed;
+    private boolean pass;
     /**
      *
      */
