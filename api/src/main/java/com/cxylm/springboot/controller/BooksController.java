@@ -148,7 +148,9 @@ public class BooksController extends ApiController {
         Integer userId = getUserId();
 //        Integer bookId = courseCard.getCourseId();
         Integer bookId = form.getBookId();
-        AssertUtil.isTrue(courseCard.getUserId().equals(userId), "该课程已被其他用户绑定");
+        if (courseCard.getUserId() != null) {
+            AssertUtil.isTrue(courseCard.getUserId().equals(userId), "该课程已被其他用户绑定");
+        }
         BookInfo bookInfo = booksService.getById(bookId);
         AssertUtil.isTrue(bookInfo != null, "课程不存在，请联系平台");
 
