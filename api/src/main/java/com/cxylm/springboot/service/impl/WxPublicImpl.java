@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.additional.query.impl.LambdaQueryChainWrapper;
 import com.cxylm.springboot.dto.WXPushMessage;
+import com.cxylm.springboot.dto.result.XyDateDto;
 import com.cxylm.springboot.enums.AccountState;
 import com.cxylm.springboot.exception.AppBadRequestException;
 import com.cxylm.springboot.model.AppUser;
@@ -70,10 +71,18 @@ public class WxPublicImpl implements WxPublicService {
         int i = (spellTime + learningTime + testTime) / 60;
         pusStr.append("累计学习时间：【").append(i).append("】").append("分钟\n");
         //昨日学习单词数量
-        int count = studyWordRecordsService.count(new LambdaQueryWrapper<StudyWordRecords>()
-                .eq(StudyWordRecords::getUserId, user.getId())
-                .between(StudyWordRecords::getCreateTime, DateUtil.format(DateUtil.yesterday(), "yyyy-MM-dd 00:00:00"), DateUtil.format(DateUtil.yesterday(), "yyyy-MM-dd 23:59:59"))
-        );
+//        int count = studyWordRecordsService.count(new LambdaQueryWrapper<StudyWordRecords>()
+//                .eq(StudyWordRecords::getUserId, user.getId())
+//                .between(StudyWordRecords::getCreateTime, DateUtil.format(DateUtil.yesterday(), "yyyy-MM-dd 00:00:00"), DateUtil.format(DateUtil.yesterday(), "yyyy-MM-dd 23:59:59"))
+//        );
+        List<XyDateDto> histogram = studyTestRecordsService.histogram(uid);
+        int count = 0;
+        for (XyDateDto xyDateDto : histogram) {
+            String xData = xyDateDto.getXData();
+            if (xData.equals(DateUtil.format(DateUtil.yesterday(), "yyyy-MM-dd"))) {
+                count = xyDateDto.getYData();
+            }
+        }
         pusStr.append("昨日学习单词数量【").append(count).append("】\n");
 
         List<StudyTestRecords> list = studyTestRecordsService.list(new LambdaQueryWrapper<StudyTestRecords>()
